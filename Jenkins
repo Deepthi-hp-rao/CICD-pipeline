@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('git') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Jenkins-git-integration', url: 'https://github.com/Deepthi-hp-rao/CICD-pipeline.git']])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'docker build -t deepthihp2/my-python-app .'
+            }
+        }
+
+        //stage('Test') {
+            //steps {
+               // sh 'docker run deepthihp2/my-python-app python -m unittest discover tests'
+            //}
+        //}
+
+        stage('image push') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhubpwd', variable: 'dockerhubpwd')]) {
+                sh 'docker login -u deepthihp2 -p ${dockerhubpwd}'
+                }
+                sh 'docker push deepthihp2/my-python-app'
+            }
+        }
+    }
+}
+
