@@ -28,6 +28,16 @@ pipeline {
                 sh 'docker push deepthihp2/my-python-app'
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    kubernetesDeploy(
+                        kubeconfigId: 'config',
+                        configs: 'deploymentservice.yaml',
+                        enableConfigSubstitution: true
+                    )
+                }
+            }
+        }
     }
 }
-
